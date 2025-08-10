@@ -15,6 +15,7 @@ serve(async (req) => {
   try {
     const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
     if (!OPENROUTER_API_KEY) {
+      console.error("OPENROUTER_API_KEY is not set in Edge Function secrets");
       return new Response(JSON.stringify({ error: "OPENROUTER_API_KEY is not set" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -64,6 +65,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         "HTTP-Referer": referer,
+        "Referer": referer,
         "X-Title": metadata?.title ?? "Stoic Coach",
       },
       body: JSON.stringify(body),
@@ -71,6 +73,7 @@ serve(async (req) => {
 
     if (!openrouterRes.ok) {
       const errTxt = await openrouterRes.text();
+      console.error("OpenRouter returned non-OK", openrouterRes.status, errTxt);
       return new Response(JSON.stringify({ error: "OpenRouter error", details: errTxt }), {
         status: openrouterRes.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
