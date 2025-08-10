@@ -50,8 +50,7 @@ serve(async (req) => {
           { role: "user", content: String(prompt ?? "Hello") },
         ];
 
-    const body = {
-      model,
+    const baseBody = {
       messages: normalizedMessages,
       stream,
       temperature,
@@ -60,65 +59,78 @@ serve(async (req) => {
     };
 
     const refererHeader = req.headers.get("origin") ?? req.headers.get("referer") ?? "https://9d8ea720-a5bf-47e0-bec8-dc498c38b65c.lovableproject.com";
-    console.log("Invoking OpenRouter", { model, refererHeader, msgCount: normalizedMessages.length });
 
-    const openrouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "HTTP-Referer": refererHeader,
-        "Referer": refererHeader,
-        "X-Title": metadata?.title ?? "Stoic Coach",
-      },
-      body: JSON.stringify(body),
-    });
+    // Candidate models to try in order if the selected one isn't available for this key
+    const modelsToTry = Array.from(new Set([
+      model,
+      "meta-llama/llama-3.1-8b-instruct:free",
+      "mistralai/mistral-7b-instruct:free",
+      "qwen/qwen-2.5-7b-instruct:free",
+    ]));
 
-    if (!openrouterRes.ok) {
-      const errTxt = await openrouterRes.text();
+    let lastError: any = null;
+
+    for (const candidate of modelsToTry) {
+      const body = { ...baseBody, model: candidate };
+      console.log("Invoking OpenRouter", { model: candidate, refererHeader, msgCount: normalizedMessages.length });
+
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": refererHeader,
+          "Referer": refererHeader,
+          "X-Title": metadata?.title ?? "Stoic Coach",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        // If streaming requested, proxy the stream
+        if (stream) {
+          return new Response(res.body, {
+            status: 200,
+            headers: {
+              ...corsHeaders,
+              "Content-Type": res.headers.get("Content-Type") ?? "text/event-stream",
+              "Cache-Control": "no-cache",
+              Connection: "keep-alive",
+            },
+          });
+        }
+
+        const data = await res.json();
+        return new Response(JSON.stringify(data), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const errTxt = await res.text();
       let parsed: any = null;
       try { parsed = JSON.parse(errTxt); } catch { /* not json */ }
-      const reqId = openrouterRes.headers.get("x-request-id") || openrouterRes.headers.get("openrouter-request-id") || undefined;
-      console.error("OpenRouter returned non-OK", {
-        status: openrouterRes.status,
+      const reqId = res.headers.get("x-request-id") || res.headers.get("openrouter-request-id") || undefined;
+      lastError = {
+        error: "OpenRouter error",
+        status: res.status,
         reqId,
-        model,
-        refererHeader,
+        model: candidate,
+        referer: refererHeader,
         msgCount: normalizedMessages.length,
-        error: parsed ?? errTxt,
-      });
-      return new Response(
-        JSON.stringify({
-          error: "OpenRouter error",
-          status: openrouterRes.status,
-          reqId,
-          model,
-          referer: refererHeader,
-          msgCount: normalizedMessages.length,
-          openrouter: parsed ?? errTxt,
-        }),
-        {
-          status: openrouterRes.status,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+        openrouter: parsed ?? errTxt,
+      };
+      console.error("OpenRouter returned non-OK", lastError);
+
+      // Only fall back automatically on the specific 404 provider-unavailable case
+      const isNoProvider404 = res.status === 404 && (parsed?.error?.message?.includes("No allowed providers") || parsed?.error?.code === 404);
+      if (!isNoProvider404) {
+        break;
+      }
     }
 
-    // If streaming requested, just proxy the stream
-    if (stream) {
-      return new Response(openrouterRes.body, {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": openrouterRes.headers.get("Content-Type") ?? "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      });
-    }
-
-    const data = await openrouterRes.json();
-    return new Response(JSON.stringify(data), {
+    // If we reach here, all attempts failed
+    return new Response(JSON.stringify(lastError ?? { error: "OpenRouter error", status: 500 }), {
+      status: lastError?.status ?? 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
