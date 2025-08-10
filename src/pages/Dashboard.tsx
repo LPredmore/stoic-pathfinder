@@ -1,12 +1,67 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageSquare, Flame, Target } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard: React.FC = () => {
+  const { toast } = useToast();
+  type Msg = { role: "user" | "assistant" | "system"; content: string };
+  const [messages, setMessages] = useState<Msg[]>([
+    { role: "assistant", content: "How can I help you apply Stoic thinking today?" },
+  ]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    const next = [...messages, { role: "user" as const, content: text }];
+    setMessages(next);
+    setInput("");
+    setLoading(true);
+
+    const { data, error } = await supabase.functions.invoke("openrouter", {
+      body: {
+        messages: next.map((m) => ({ role: m.role, content: m.content })),
+        model: "google/gemini-2.0-flash",
+        stream: false,
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 600,
+        metadata: { title: "Stoic Coach" },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      console.error("Chat error", error);
+      toast({ title: "Chat error", description: String(error.message ?? error), variant: "destructive" as any });
+      return;
+    }
+
+    const assistant = data?.choices?.[0]?.message?.content ?? "(no response)";
+    setMessages((prev) => [...prev, { role: "assistant", content: assistant }]);
+  };
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   return (
     <div className="container py-10">
       <SEO
@@ -25,13 +80,36 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="h-[320px] rounded-md border bg-muted/30">
-              <ScrollArea className="h-full p-4 space-y-3">
-                <div className="text-muted-foreground">Conversation will appear here.</div>
+              <ScrollArea className="h-full p-4">
+                <div className="flex flex-col gap-3">
+                  {messages.filter(m => m.role !== 'system').map((m, idx) => (
+                    <div key={idx} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start'}>
+                      <div
+                        className={
+                          m.role === 'user'
+                            ? 'max-w-[85%] rounded-lg bg-primary px-3 py-2 text-primary-foreground'
+                            : 'max-w-[85%] rounded-lg bg-accent px-3 py-2 text-accent-foreground'
+                        }
+                      >
+                        {m.content}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={bottomRef} />
+                </div>
               </ScrollArea>
             </div>
             <div className="mt-3 flex items-center gap-2">
-              <Input placeholder="Type a message…" />
-              <Button variant="default">Send</Button>
+              <Input
+                placeholder="Type a message…"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={loading}
+              />
+              <Button variant="default" onClick={sendMessage} disabled={loading || !input.trim()}>
+                {loading ? 'Sending…' : 'Send'}
+              </Button>
             </div>
           </CardContent>
         </Card>
