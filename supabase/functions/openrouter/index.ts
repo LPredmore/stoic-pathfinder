@@ -14,6 +14,7 @@ serve(async (req) => {
   }
 
   try {
+    const debug = req.headers.get("x-debug") === "1";
     const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
     if (!OPENROUTER_API_KEY) {
       console.error("OPENROUTER_API_KEY is not set in Edge Function secrets");

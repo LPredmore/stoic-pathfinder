@@ -32,6 +32,7 @@ const Dashboard: React.FC = () => {
     setLoading(true);
 
     const { data, error } = await supabase.functions.invoke("openrouter", {
+      headers: { "x-debug": "1" },
       body: {
         messages: next.map((m) => ({ role: m.role, content: m.content })),
         model: "google/gemini-2.0-flash-exp:free",
@@ -47,7 +48,18 @@ const Dashboard: React.FC = () => {
 
     if (error) {
       console.error("Chat error", error);
+      // If server returned debug payload despite non-2xx, try to surface it
+      if ((error as any).context?.response) {
+        console.error("Edge response:", (error as any).context.response);
+      }
       toast({ title: "Chat error", description: String(error.message ?? error), variant: "destructive" as any });
+      return;
+    }
+
+    // If server returned ok:false in debug mode
+    if (data && (data as any).error) {
+      console.error("OpenRouter error payload", data);
+      toast({ title: `Model error (${(data as any).status})`, description: JSON.stringify((data as any).openrouter), variant: "destructive" as any });
       return;
     }
 
