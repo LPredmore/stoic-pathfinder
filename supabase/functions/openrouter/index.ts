@@ -81,8 +81,10 @@ serve(async (req) => {
     // Preferred candidates; we'll filter to what's available for this key
     const preferred = [
       model,
-      "meta-llama/llama-3.3-70b-instruct:free",
+      "openai/gpt-4o-mini",
+      "gpt-4o-mini",
       "openrouter/auto",
+      "meta-llama/llama-3.3-70b-instruct:free",
       "meta-llama/llama-3.1-8b-instruct:free",
       "mistralai/mistral-7b-instruct:free",
       "qwen/qwen-2.5-7b-instruct:free",
