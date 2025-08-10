@@ -75,11 +75,32 @@ serve(async (req) => {
 
     if (!openrouterRes.ok) {
       const errTxt = await openrouterRes.text();
-      console.error("OpenRouter returned non-OK", openrouterRes.status, errTxt);
-      return new Response(JSON.stringify({ error: "OpenRouter error", details: errTxt }), {
+      let parsed: any = null;
+      try { parsed = JSON.parse(errTxt); } catch { /* not json */ }
+      const reqId = openrouterRes.headers.get("x-request-id") || openrouterRes.headers.get("openrouter-request-id") || undefined;
+      console.error("OpenRouter returned non-OK", {
         status: openrouterRes.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        reqId,
+        model,
+        refererHeader,
+        msgCount: normalizedMessages.length,
+        error: parsed ?? errTxt,
       });
+      return new Response(
+        JSON.stringify({
+          error: "OpenRouter error",
+          status: openrouterRes.status,
+          reqId,
+          model,
+          referer: refererHeader,
+          msgCount: normalizedMessages.length,
+          openrouter: parsed ?? errTxt,
+        }),
+        {
+          status: openrouterRes.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     // If streaming requested, just proxy the stream
