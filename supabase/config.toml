@@ -1,1 +1,7 @@
 project_id = "orgtxrsagsbeexaafjya"
+
+[functions.openrouter]
+verify_jwt = false
+
+[functions.openai-chat]
+verify_jwt = false

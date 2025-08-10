@@ -31,16 +31,14 @@ const Dashboard: React.FC = () => {
     setInput("");
     setLoading(true);
 
-    const { data, error } = await supabase.functions.invoke("openrouter", {
+    const { data, error } = await supabase.functions.invoke("openai-chat", {
       headers: { "x-debug": "1" },
       body: {
         messages: next.map((m) => ({ role: m.role, content: m.content })),
-        model: "meta-llama/llama-3.3-70b-instruct:free",
         stream: false,
         temperature: 0.2,
         top_p: 0.9,
         max_tokens: 600,
-        metadata: { title: "Stoic Coach" },
       },
     });
 
@@ -58,15 +56,14 @@ const Dashboard: React.FC = () => {
 
     // If server returned ok:false in debug mode
     if (data && (data as any).error) {
-      console.error("OpenRouter error payload", data);
+      console.error("OpenAI error payload", data);
       const status = (data as any).status;
-      const tried = (data as any).tried as string[] | undefined;
-      const msg = (data as any).openrouter?.error?.message || "Model unavailable";
-      toast({ title: `Model error (${status})`, description: `${msg}${tried?.length ? ` | Tried: ${tried.join(', ')}` : ''}`, variant: "destructive" as any });
+      const msg = (data as any).openai?.error?.message || (data as any).error || "Service unavailable";
+      toast({ title: `Model error (${status})`, description: msg, variant: "destructive" as any });
       // Add a friendly assistant message so the chat doesn't dead-end
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "I couldn’t reach a free provider with your OpenRouter key right now. You can try again shortly or switch models. If you have a paid key or another provider (OpenAI/Anthropic), I can use that too." },
+        { role: "assistant", content: "I couldn’t reach OpenAI right now with your key (quota or access issue). Try again in a bit or check your OpenAI usage/billing." },
       ]);
       return;
     }
