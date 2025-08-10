@@ -14,6 +14,9 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import OnboardingIndex from "./pages/OnboardingIndex";
+import OnboardingAlwaysNever from "./pages/OnboardingAlwaysNever";
+import OnboardingAgreeDisagree from "./pages/OnboardingAgreeDisagree";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +33,9 @@ const App = () => (
               <Route path="auth" element={<Auth />} />
 
               <Route element={<ProtectedRoute />}>
+                <Route path="onboarding" element={<OnboardingIndex />} />
+                <Route path="onboarding/always-never" element={<OnboardingAlwaysNever />} />
+                <Route path="onboarding/agree-disagree" element={<OnboardingAgreeDisagree />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="role-play" element={<RolePlay />} />
                 <Route path="story" element={<Story />} />
