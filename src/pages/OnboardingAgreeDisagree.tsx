@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -64,7 +64,7 @@ const OnboardingAgreeDisagree: React.FC = () => {
 
         // Ensure profile exists
         const { data: prof } = await (supabase
-          .from<any>("profiles")
+          .from("profiles")
           .select("id")
           .eq("user_id", user.id)
           .maybeSingle());
@@ -72,7 +72,7 @@ const OnboardingAgreeDisagree: React.FC = () => {
         let pid = prof?.id as string | undefined;
         if (!pid) {
           const { data: newProf, error: insErr } = await (supabase
-            .from<any>("profiles")
+            .from("profiles")
             .insert({ user_id: user.id })
             .select("id")
             .single());
@@ -83,7 +83,7 @@ const OnboardingAgreeDisagree: React.FC = () => {
 
         // Load existing responses
         const { data: existing, error } = await (supabase
-          .from<any>("agree_disagree")
+          .from("agree_disagree")
           .select("*")
           .eq("profile_id", pid)
           .maybeSingle());
@@ -116,7 +116,7 @@ const OnboardingAgreeDisagree: React.FC = () => {
         payload[q.key] = values[q.key] ?? null;
       });
       const { error } = await (supabase
-        .from<any>("agree_disagree")
+        .from("agree_disagree")
         .upsert(payload, { onConflict: "profile_id" }));
       if (error) throw error;
       // After finishing, send to dashboard; ProtectedRoute will allow it only if both pages complete

@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import React from "react";
@@ -18,14 +18,14 @@ const OnboardingIndex: React.FC = () => {
         }
         // Ensure profile exists
         const { data: prof } = await (supabase
-          .from<any>("profiles")
+          .from("profiles")
           .select("id")
           .eq("user_id", user.id)
           .maybeSingle());
         let pid = prof?.id as string | undefined;
         if (!pid) {
           const { data: newProf, error: insErr } = await (supabase
-            .from<any>("profiles")
+            .from("profiles")
             .insert({ user_id: user.id })
             .select("id")
             .single());
@@ -54,12 +54,12 @@ const OnboardingIndex: React.FC = () => {
         ];
 
         const { data: an } = await (supabase
-          .from<any>("always_never")
+          .from("always_never")
           .select("*")
           .eq("profile_id", pid)
           .maybeSingle());
         const { data: ag } = await (supabase
-          .from<any>("agree_disagree")
+          .from("agree_disagree")
           .select("*")
           .eq("profile_id", pid)
           .maybeSingle());

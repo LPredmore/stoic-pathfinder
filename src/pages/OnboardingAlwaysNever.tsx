@@ -1,4 +1,4 @@
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -69,7 +69,7 @@ const OnboardingAlwaysNever: React.FC = () => {
 
         // Ensure profile exists
         const { data: prof, error: profErr } = await (supabase
-          .from<any>("profiles")
+          .from("profiles")
           .select("id")
           .eq("user_id", user.id)
           .maybeSingle());
@@ -77,7 +77,7 @@ const OnboardingAlwaysNever: React.FC = () => {
         let pid = prof?.id as string | undefined;
         if (!pid) {
           const { data: newProf, error: insErr } = await (supabase
-            .from<any>("profiles")
+            .from("profiles")
             .insert({ user_id: user.id })
             .select("id")
             .single());
@@ -88,7 +88,7 @@ const OnboardingAlwaysNever: React.FC = () => {
 
         // Load existing responses
         const { data: existing, error } = await (supabase
-          .from<any>("always_never")
+          .from("always_never")
           .select("*")
           .eq("profile_id", pid)
           .maybeSingle());
@@ -121,7 +121,7 @@ const OnboardingAlwaysNever: React.FC = () => {
         payload[q.key] = values[q.key] ?? null;
       });
       const { error } = await (supabase
-        .from<any>("always_never")
+        .from("always_never")
         .upsert(payload, { onConflict: "profile_id" }));
       if (error) throw error;
       navigate("/onboarding/agree-disagree", { replace: true });

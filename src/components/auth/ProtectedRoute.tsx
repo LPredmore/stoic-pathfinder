@@ -26,14 +26,14 @@ const ProtectedRoute: React.FC = () => {
           const userId = session!.user.id;
           // Ensure profile exists
           const { data: prof } = await (supabase
-            .from<any>("profiles")
+            .from("profiles")
             .select("id")
             .eq("user_id", userId)
             .maybeSingle());
           let pid = prof?.id as string | undefined;
           if (!pid) {
             const { data: newProf, error: insErr } = await (supabase
-              .from<any>("profiles")
+              .from("profiles")
               .insert({ user_id: userId })
               .select("id")
               .single());
@@ -62,12 +62,12 @@ const ProtectedRoute: React.FC = () => {
           ];
 
           const { data: an } = await (supabase
-            .from<any>("always_never")
+            .from("always_never")
             .select("*")
             .eq("profile_id", pid)
             .maybeSingle());
           const { data: ag } = await (supabase
-            .from<any>("agree_disagree")
+            .from("agree_disagree")
             .select("*")
             .eq("profile_id", pid)
             .maybeSingle());
