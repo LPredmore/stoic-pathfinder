@@ -67,6 +67,65 @@ export type Database = {
           },
         ]
       }
+      ai_therapist_settings: {
+        Row: {
+          created_at: string
+          created_by_profile: string | null
+          custom_tools: Json | null
+          escalation_policy: string | null
+          id: string
+          is_active: boolean
+          persona: string | null
+          principles: string[] | null
+          prohibited_topics: string | null
+          response_style: string | null
+          safety_boundaries: string | null
+          session_closing: string | null
+          session_opening: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_profile?: string | null
+          custom_tools?: Json | null
+          escalation_policy?: string | null
+          id?: string
+          is_active?: boolean
+          persona?: string | null
+          principles?: string[] | null
+          prohibited_topics?: string | null
+          response_style?: string | null
+          safety_boundaries?: string | null
+          session_closing?: string | null
+          session_opening?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_profile?: string | null
+          custom_tools?: Json | null
+          escalation_policy?: string | null
+          id?: string
+          is_active?: boolean
+          persona?: string | null
+          principles?: string[] | null
+          prohibited_topics?: string | null
+          response_style?: string | null
+          safety_boundaries?: string | null
+          session_closing?: string | null
+          session_opening?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_therapist_settings_created_by_profile_fkey"
+            columns: ["created_by_profile"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       always_never: {
         Row: {
           analyze_vs_distract_when_stressed: number | null
@@ -119,6 +178,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin: boolean
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -129,6 +189,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -139,6 +200,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
