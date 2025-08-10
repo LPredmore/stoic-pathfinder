@@ -119,7 +119,14 @@ const OnboardingAgreeDisagree: React.FC = () => {
         .from("agree_disagree")
         .upsert(payload, { onConflict: "profile_id" }));
       if (error) throw error;
-      // After finishing, send to dashboard; ProtectedRoute will allow it only if both pages complete
+
+      // Mark onboarding complete
+      const { error: statusErr } = await (supabase
+        .from("profiles")
+        .update({ onboarding_status: "complete" })
+        .eq("id", profileId));
+      if (statusErr) throw statusErr;
+
       navigate("/dashboard", { replace: true });
     } catch (e: any) {
       console.error(e);

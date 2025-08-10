@@ -124,6 +124,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          onboarding_status: Database["public"]["Enums"]["onboarding_status"]
           updated_at: string
           user_id: string
         }
@@ -133,6 +134,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           updated_at?: string
           user_id: string
         }
@@ -142,6 +144,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           updated_at?: string
           user_id?: string
         }
@@ -155,7 +158,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      onboarding_status: "onboarding" | "complete"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -282,6 +285,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      onboarding_status: ["onboarding", "complete"],
+    },
   },
 } as const

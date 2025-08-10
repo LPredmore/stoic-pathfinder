@@ -24,67 +24,35 @@ const ProtectedRoute: React.FC = () => {
         setChecking(true);
         try {
           const userId = session!.user.id;
-          // Ensure profile exists
-          const { data: prof } = await (supabase
+          // Ensure profile exists and get onboarding_status
+          const { data: prof } = await supabase
             .from("profiles")
-            .select("id")
+            .select("id, onboarding_status")
             .eq("user_id", userId)
-            .maybeSingle());
+            .maybeSingle();
+
           let pid = prof?.id as string | undefined;
+          let status = (prof as any)?.onboarding_status as 'onboarding' | 'complete' | undefined;
+
           if (!pid) {
-            const { data: newProf, error: insErr } = await (supabase
+            const { data: newProf, error: insErr } = await supabase
               .from("profiles")
               .insert({ user_id: userId })
-              .select("id")
-              .single());
+              .select("id, onboarding_status")
+              .single();
             if (insErr) throw insErr;
             pid = newProf.id as string;
+            status = (newProf as any).onboarding_status as any;
           }
 
-          const anCols = [
-            "making_plans_prefer_schedule",
-            "thrill_seeking_frequency",
-            "analyze_vs_distract_when_stressed",
-            "understand_upset_friend_immediately",
-            "rely_logic_over_gut",
-            "follow_through_long_term_goals",
-            "anxious_talk_it_out_vs_internal",
-          ];
-          const agCols = [
-            "energized_by_many_people",
-            "own_emotions_easier_than_others",
-            "highly_organized_person",
-            "notice_subtle_mood_changes",
-            "comfortable_challenging_norms",
-            "easy_to_admit_wrong",
-            "prefer_exploring_new_ideas",
-            "fairness_honesty_important",
-          ];
-
-          const { data: an } = await (supabase
-            .from("always_never")
-            .select("*")
-            .eq("profile_id", pid)
-            .maybeSingle());
-          const { data: ag } = await (supabase
-            .from("agree_disagree")
-            .select("*")
-            .eq("profile_id", pid)
-            .maybeSingle());
-
-          const anIncomplete = !an || anCols.some((k) => typeof an[k] !== "number" || an[k] < 1 || an[k] > 5);
-          const agIncomplete = !ag || agCols.some((k) => typeof ag[k] !== "number" || ag[k] < 1 || ag[k] > 5);
-
-          if (anIncomplete) {
-            setOnboardingRequired(true);
-            setNextStep("always-never");
-          } else if (agIncomplete) {
-            setOnboardingRequired(true);
-            setNextStep("agree-disagree");
-          } else {
+          if (status === "complete") {
             setOnboardingRequired(false);
             setNextStep(null);
+          } else {
+            setOnboardingRequired(true);
+            setNextStep("always-never");
           }
+
         } catch (e) {
           console.error("Onboarding check failed", e);
           // Fail-open to dashboard
