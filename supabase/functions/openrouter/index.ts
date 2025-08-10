@@ -33,7 +33,7 @@ serve(async (req) => {
     const {
       messages,
       prompt,
-      model = "google/gemini-2.0-flash",
+      model = "google/gemini-2.0-flash-001",
       stream = false,
       temperature = 0.2,
       top_p = 0.9,

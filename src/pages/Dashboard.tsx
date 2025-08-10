@@ -34,7 +34,7 @@ const Dashboard: React.FC = () => {
     const { data, error } = await supabase.functions.invoke("openrouter", {
       body: {
         messages: next.map((m) => ({ role: m.role, content: m.content })),
-        model: "google/gemini-2.0-flash",
+        model: "google/gemini-2.0-flash-001",
         stream: false,
         temperature: 0.2,
         top_p: 0.9,
