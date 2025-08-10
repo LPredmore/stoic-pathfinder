@@ -60,14 +60,45 @@ serve(async (req) => {
 
     const refererHeader = req.headers.get("origin") ?? req.headers.get("referer") ?? "https://9d8ea720-a5bf-47e0-bec8-dc498c38b65c.lovableproject.com";
 
-    // Candidate models to try in order if the selected one isn't available for this key
-    const modelsToTry = Array.from(new Set([
+    // Discover models available to this API key
+    let availableIds = new Set<string>();
+    try {
+      const modelsRes = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}` },
+      });
+      if (modelsRes.ok) {
+        const modelsJson = await modelsRes.json();
+        const ids: string[] = (modelsJson?.data ?? []).map((m: any) => m.id);
+        availableIds = new Set(ids);
+        console.log("Available models (count)", ids.length);
+      } else {
+        console.warn("Failed to fetch models list", modelsRes.status);
+      }
+    } catch (e) {
+      console.warn("Error fetching models list", e);
+    }
+
+    // Preferred candidates; we'll filter to what's available for this key
+    const preferred = [
       model,
+      "meta-llama/llama-3.3-70b-instruct:free",
       "openrouter/auto",
       "meta-llama/llama-3.1-8b-instruct:free",
       "mistralai/mistral-7b-instruct:free",
       "qwen/qwen-2.5-7b-instruct:free",
-    ]));
+    ];
+
+    let modelsToTry = Array.from(new Set(
+      (availableIds.size > 0
+        ? preferred.filter((id) => id === "openrouter/auto" || availableIds.has(id))
+        : preferred)
+    ));
+
+    // If we have availability info but nothing matched, fall back to any free model available
+    if (availableIds.size > 0 && modelsToTry.length === 0) {
+      const freeAvailable = Array.from(availableIds).filter((id) => id.endsWith(":free"));
+      modelsToTry = freeAvailable.length ? freeAvailable : Array.from(availableIds);
+    }
 
     let lastError: any = null;
 
@@ -129,9 +160,9 @@ serve(async (req) => {
       }
     }
 
-    // If we reach here, all attempts failed
+    // If we reach here, all attempts failed; return 200 with error payload so client can display a friendly message
     return new Response(JSON.stringify(lastError ?? { error: "OpenRouter error", status: 500 }), {
-      status: lastError?.status ?? 500,
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
