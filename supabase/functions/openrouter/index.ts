@@ -63,6 +63,7 @@ serve(async (req) => {
     // Candidate models to try in order if the selected one isn't available for this key
     const modelsToTry = Array.from(new Set([
       model,
+      "openrouter/auto",
       "meta-llama/llama-3.1-8b-instruct:free",
       "mistralai/mistral-7b-instruct:free",
       "qwen/qwen-2.5-7b-instruct:free",
