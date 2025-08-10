@@ -1,7 +1,9 @@
 import React from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
@@ -12,6 +14,30 @@ const navItems = [
 ];
 
 const AppLayout: React.FC = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isAuthed, setIsAuthed] = React.useState(false);
+
+  React.useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthed(!!session);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthed(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({ title: "Sign out failed", description: error.message, variant: "destructive" as any });
+      return;
+    }
+    toast({ title: "Signed out" });
+    navigate("/auth", { replace: true });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-app text-foreground">
       <header className="sticky top-0 z-40 border-b bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -41,12 +67,22 @@ const AppLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to="/auth">Sign in</Link>
-            </Button>
-            <Button asChild variant="hero" size="sm">
-              <Link to="/dashboard">Open App</Link>
-            </Button>
+            {isAuthed ? (
+              <>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/auth">Sign in</Link>
+                </Button>
+                <Button asChild variant="hero" size="sm">
+                  <Link to="/dashboard">Open App</Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
       </header>

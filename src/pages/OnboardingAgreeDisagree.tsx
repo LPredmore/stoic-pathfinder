@@ -172,7 +172,7 @@ const OnboardingAgreeDisagree: React.FC = () => {
 
               <div className="flex justify-between gap-3">
                 <Button type="button" variant="secondary" onClick={() => navigate("/onboarding/always-never")}>Back</Button>
-                <Button type="submit" disabled={!canFinish || saving}>
+                <Button type="submit" disabled={!canFinish || saving} aria-disabled={!canFinish || saving}>
                   {saving ? "Saving..." : "Finish"}
                 </Button>
               </div>

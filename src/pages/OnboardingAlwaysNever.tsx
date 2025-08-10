@@ -168,7 +168,7 @@ const OnboardingAlwaysNever: React.FC = () => {
               ))}
 
               <div className="flex justify-end gap-3">
-                <Button type="submit" disabled={!canContinue || saving}>
+                <Button type="submit" disabled={!canContinue || saving} aria-disabled={!canContinue || saving}>
                   {saving ? "Saving..." : "Continue"}
                 </Button>
               </div>
