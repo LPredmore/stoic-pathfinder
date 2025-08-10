@@ -41,6 +41,9 @@ const AppLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">Sign in</Link>
+            </Button>
             <Button asChild variant="hero" size="sm">
               <Link to="/dashboard">Open App</Link>
             </Button>

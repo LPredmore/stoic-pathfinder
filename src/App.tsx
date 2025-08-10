@@ -12,6 +12,8 @@ import Story from "./pages/Story";
 import Goals from "./pages/Goals";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -25,11 +27,15 @@ const App = () => (
           <Routes>
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Index />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="role-play" element={<RolePlay />} />
-              <Route path="story" element={<Story />} />
-              <Route path="goals" element={<Goals />} />
-              <Route path="settings" element={<Settings />} />
+              <Route path="auth" element={<Auth />} />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="role-play" element={<RolePlay />} />
+                <Route path="story" element={<Story />} />
+                <Route path="goals" element={<Goals />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
