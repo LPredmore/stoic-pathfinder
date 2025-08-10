@@ -17,14 +17,42 @@ const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isAuthed, setIsAuthed] = React.useState(false);
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   React.useEffect(() => {
+    const fetchAdmin = async (userId: string) => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("admin")
+          .eq("user_id", userId)
+          .maybeSingle();
+        setIsAdmin(!!(data as any)?.admin);
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthed(!!session);
+      const authed = !!session;
+      setIsAuthed(authed);
+      if (authed && session?.user?.id) {
+        fetchAdmin(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthed(!!session);
+      const authed = !!session;
+      setIsAuthed(authed);
+      if (authed && session?.user?.id) {
+        fetchAdmin(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
+
     return () => subscription.unsubscribe();
   }, []);
 
@@ -64,6 +92,21 @@ const AppLayout: React.FC = () => {
                 {item.label}
               </NavLink>
             ))}
+            {isAdmin && (
+              <NavLink
+                to="/training"
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 rounded-md text-sm transition-colors",
+                    isActive
+                      ? "bg-secondary text-secondary-foreground"
+                      : "hover:bg-accent hover:text-accent-foreground"
+                  )
+                }
+              >
+                Training
+              </NavLink>
+            )}
           </div>
 
           <div className="flex items-center gap-2">

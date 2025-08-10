@@ -17,6 +17,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import OnboardingIndex from "./pages/OnboardingIndex";
 import OnboardingAlwaysNever from "./pages/OnboardingAlwaysNever";
 import OnboardingAgreeDisagree from "./pages/OnboardingAgreeDisagree";
+import Training from "./pages/Training";
+import AdminRoute from "./components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,9 @@ const App = () => (
                 <Route path="story" element={<Story />} />
                 <Route path="goals" element={<Goals />} />
                 <Route path="settings" element={<Settings />} />
+                <Route element={<AdminRoute />}>
+                  <Route path="training" element={<Training />} />
+                </Route>
               </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
