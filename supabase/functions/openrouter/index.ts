@@ -4,6 +4,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 serve(async (req) => {
@@ -57,15 +58,16 @@ serve(async (req) => {
       max_tokens,
     };
 
-    const referer = req.headers.get("origin") ?? "https://lovable.dev";
+    const refererHeader = req.headers.get("origin") ?? req.headers.get("referer") ?? "https://9d8ea720-a5bf-47e0-bec8-dc498c38b65c.lovableproject.com";
+    console.log("Invoking OpenRouter", { model, refererHeader, msgCount: normalizedMessages.length });
 
     const openrouterRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "HTTP-Referer": referer,
-        "Referer": referer,
+        "HTTP-Referer": refererHeader,
+        "Referer": refererHeader,
         "X-Title": metadata?.title ?? "Stoic Coach",
       },
       body: JSON.stringify(body),
