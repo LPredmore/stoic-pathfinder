@@ -101,8 +101,10 @@ serve(async (req) => {
     }
 
     let lastError: any = null;
+    const tried: string[] = [];
 
     for (const candidate of modelsToTry) {
+      tried.push(candidate);
       const body = { ...baseBody, model: candidate };
       console.log("Invoking OpenRouter", { model: candidate, refererHeader, msgCount: normalizedMessages.length });
 
@@ -111,8 +113,7 @@ serve(async (req) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          "HTTP-Referer": refererHeader,
-          "Referer": refererHeader,
+          // Intentionally omit Referer headers to avoid domain restrictions
           "X-Title": metadata?.title ?? "Stoic Coach",
         },
         body: JSON.stringify(body),
@@ -149,6 +150,7 @@ serve(async (req) => {
         model: candidate,
         referer: refererHeader,
         msgCount: normalizedMessages.length,
+        tried,
         openrouter: parsed ?? errTxt,
       };
       console.error("OpenRouter returned non-OK", lastError);

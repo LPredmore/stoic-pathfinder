@@ -59,7 +59,15 @@ const Dashboard: React.FC = () => {
     // If server returned ok:false in debug mode
     if (data && (data as any).error) {
       console.error("OpenRouter error payload", data);
-      toast({ title: `Model error (${(data as any).status})`, description: JSON.stringify((data as any).openrouter), variant: "destructive" as any });
+      const status = (data as any).status;
+      const tried = (data as any).tried as string[] | undefined;
+      const msg = (data as any).openrouter?.error?.message || "Model unavailable";
+      toast({ title: `Model error (${status})`, description: `${msg}${tried?.length ? ` | Tried: ${tried.join(', ')}` : ''}`, variant: "destructive" as any });
+      // Add a friendly assistant message so the chat doesn't dead-end
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "I couldn’t reach a free provider with your OpenRouter key right now. You can try again shortly or switch models. If you have a paid key or another provider (OpenAI/Anthropic), I can use that too." },
+      ]);
       return;
     }
 
