@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
       headers: { "x-debug": "1" },
       body: {
         messages: next.map((m) => ({ role: m.role, content: m.content })),
-        model: "google/gemini-2.0-flash-exp:free",
+        model: "meta-llama/llama-3.3-70b-instruct:free",
         stream: false,
         temperature: 0.2,
         top_p: 0.9,

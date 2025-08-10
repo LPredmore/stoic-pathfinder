@@ -34,7 +34,7 @@ serve(async (req) => {
     const {
       messages,
       prompt,
-      model = "google/gemini-2.0-flash-exp:free",
+      model = "meta-llama/llama-3.3-70b-instruct:free",
       stream = false,
       temperature = 0.2,
       top_p = 0.9,
