@@ -14,6 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
+      agree_disagree: {
+        Row: {
+          comfortable_challenging_norms: number | null
+          created_at: string
+          easy_to_admit_wrong: number | null
+          energized_by_many_people: number | null
+          fairness_honesty_important: number | null
+          highly_organized_person: number | null
+          id: string
+          notice_subtle_mood_changes: number | null
+          own_emotions_easier_than_others: number | null
+          prefer_exploring_new_ideas: number | null
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          comfortable_challenging_norms?: number | null
+          created_at?: string
+          easy_to_admit_wrong?: number | null
+          energized_by_many_people?: number | null
+          fairness_honesty_important?: number | null
+          highly_organized_person?: number | null
+          id?: string
+          notice_subtle_mood_changes?: number | null
+          own_emotions_easier_than_others?: number | null
+          prefer_exploring_new_ideas?: number | null
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          comfortable_challenging_norms?: number | null
+          created_at?: string
+          easy_to_admit_wrong?: number | null
+          energized_by_many_people?: number | null
+          fairness_honesty_important?: number | null
+          highly_organized_person?: number | null
+          id?: string
+          notice_subtle_mood_changes?: number | null
+          own_emotions_easier_than_others?: number | null
+          prefer_exploring_new_ideas?: number | null
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agree_disagree_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      always_never: {
+        Row: {
+          analyze_vs_distract_when_stressed: number | null
+          anxious_talk_it_out_vs_internal: number | null
+          created_at: string
+          follow_through_long_term_goals: number | null
+          id: string
+          making_plans_prefer_schedule: number | null
+          profile_id: string
+          rely_logic_over_gut: number | null
+          thrill_seeking_frequency: number | null
+          understand_upset_friend_immediately: number | null
+          updated_at: string
+        }
+        Insert: {
+          analyze_vs_distract_when_stressed?: number | null
+          anxious_talk_it_out_vs_internal?: number | null
+          created_at?: string
+          follow_through_long_term_goals?: number | null
+          id?: string
+          making_plans_prefer_schedule?: number | null
+          profile_id: string
+          rely_logic_over_gut?: number | null
+          thrill_seeking_frequency?: number | null
+          understand_upset_friend_immediately?: number | null
+          updated_at?: string
+        }
+        Update: {
+          analyze_vs_distract_when_stressed?: number | null
+          anxious_talk_it_out_vs_internal?: number | null
+          created_at?: string
+          follow_through_long_term_goals?: number | null
+          id?: string
+          making_plans_prefer_schedule?: number | null
+          profile_id?: string
+          rely_logic_over_gut?: number | null
+          thrill_seeking_frequency?: number | null
+          understand_upset_friend_immediately?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "always_never_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
