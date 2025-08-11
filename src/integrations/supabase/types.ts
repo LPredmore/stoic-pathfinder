@@ -232,6 +232,71 @@ export type Database = {
           },
         ]
       }
+      profile_scores: {
+        Row: {
+          attachment_anxiety: number | null
+          attachment_avoidance: number | null
+          big5_agreeableness: number | null
+          big5_conscientiousness: number | null
+          big5_extraversion: number | null
+          big5_neuroticism: number | null
+          big5_openness: number | null
+          eq_empathy: number | null
+          eq_self_perception: number | null
+          eq_stress_management: number | null
+          hexaco_agreeableness: number | null
+          hexaco_conscientiousness: number | null
+          hexaco_emotionality: number | null
+          hexaco_extraversion: number | null
+          hexaco_honesty_humility: number | null
+          profile_id: string
+        }
+        Insert: {
+          attachment_anxiety?: number | null
+          attachment_avoidance?: number | null
+          big5_agreeableness?: number | null
+          big5_conscientiousness?: number | null
+          big5_extraversion?: number | null
+          big5_neuroticism?: number | null
+          big5_openness?: number | null
+          eq_empathy?: number | null
+          eq_self_perception?: number | null
+          eq_stress_management?: number | null
+          hexaco_agreeableness?: number | null
+          hexaco_conscientiousness?: number | null
+          hexaco_emotionality?: number | null
+          hexaco_extraversion?: number | null
+          hexaco_honesty_humility?: number | null
+          profile_id: string
+        }
+        Update: {
+          attachment_anxiety?: number | null
+          attachment_avoidance?: number | null
+          big5_agreeableness?: number | null
+          big5_conscientiousness?: number | null
+          big5_extraversion?: number | null
+          big5_neuroticism?: number | null
+          big5_openness?: number | null
+          eq_empathy?: number | null
+          eq_self_perception?: number | null
+          eq_stress_management?: number | null
+          hexaco_agreeableness?: number | null
+          hexaco_conscientiousness?: number | null
+          hexaco_emotionality?: number | null
+          hexaco_extraversion?: number | null
+          hexaco_honesty_humility?: number | null
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_scores_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           admin: boolean
@@ -270,6 +335,104 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      question_traits: {
+        Row: {
+          question_id: string
+          trait_code: string
+          weight: number
+        }
+        Insert: {
+          question_id: string
+          trait_code: string
+          weight?: number
+        }
+        Update: {
+          question_id?: string
+          trait_code?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_traits_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          source: string
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          source: string
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          source?: string
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      responses: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          question_id: string
+          response_value: number | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          question_id: string
+          response_value?: number | null
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          question_id?: string
+          response_value?: number | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stuck_points: {
         Row: {
@@ -340,7 +503,32 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      vw_compute_profile_scores: {
+        Row: {
+          attachment_anxiety: number | null
+          attachment_avoidance: number | null
+          big5_agreeableness: number | null
+          big5_conscientiousness: number | null
+          big5_extraversion: number | null
+          big5_neuroticism: number | null
+          big5_openness: number | null
+          eq_empathy: number | null
+          eq_self_perception: number | null
+          eq_stress_management: number | null
+          hexaco_emotionality: number | null
+          hexaco_honesty_humility: number | null
+          profile_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
