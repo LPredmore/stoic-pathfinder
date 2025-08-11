@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getModeInstructions, saveModeInstructions, listModes } from "@/integrations/supabase/trainingService";
 
 const Training: React.FC = () => {
   const { toast } = useToast();
@@ -28,6 +29,12 @@ const Training: React.FC = () => {
   const [sessionClosing, setSessionClosing] = React.useState("");
   const [customTools, setCustomTools] = React.useState<string>("{}");
   const [isActive, setIsActive] = React.useState(true);
+
+  const [availableModes] = React.useState<string[]>(listModes());
+  const [selectedMode, setSelectedMode] = React.useState<string>(availableModes[0] ?? "express");
+  const [modeInstructions, setModeInstructions] = React.useState<string>("");
+  const [modeLoading, setModeLoading] = React.useState<boolean>(false);
+  const [modeSaving, setModeSaving] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const load = async () => {
@@ -74,6 +81,21 @@ const Training: React.FC = () => {
     load();
   }, [toast]);
 
+  React.useEffect(() => {
+    const loadMode = async () => {
+      setModeLoading(true);
+      try {
+        const res = await getModeInstructions(selectedMode);
+        setModeInstructions(res?.instructions ?? "");
+      } catch (e: any) {
+        toast({ title: "Failed to load mode", description: e.message, variant: "destructive" as any });
+      } finally {
+        setModeLoading(false);
+      }
+    };
+    loadMode();
+  }, [selectedMode, toast]);
+
   const addPrinciple = () => {
     const v = principleInput.trim();
     if (!v) return;
@@ -81,6 +103,18 @@ const Training: React.FC = () => {
     setPrincipleInput("");
   };
   const removePrinciple = (p: string) => setPrinciples((prev) => prev.filter((x) => x !== p));
+
+  const handleModeSave = async () => {
+    setModeSaving(true);
+    try {
+      await saveModeInstructions(selectedMode, modeInstructions);
+      toast({ title: "Mode instructions saved" });
+    } catch (e: any) {
+      toast({ title: "Save failed", description: e.message, variant: "destructive" as any });
+    } finally {
+      setModeSaving(false);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -145,6 +179,48 @@ const Training: React.FC = () => {
         description="Configure persona, principles, safety boundaries, and interaction style for your AI therapist."
       />
       <h1 className="text-3xl font-bold tracking-tight">AI Therapist Training</h1>
+
+      <div className="mt-6">
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Mode Instructions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid items-start gap-3 md:grid-cols-[240px,1fr]">
+              <div className="space-y-2">
+                <Label>Mode</Label>
+                <Select value={selectedMode} onValueChange={setSelectedMode}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableModes.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m.charAt(0).toUpperCase() + m.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="modeInstructions">Instructions</Label>
+                <Textarea
+                  id="modeInstructions"
+                  value={modeInstructions}
+                  onChange={(e) => setModeInstructions(e.target.value)}
+                  rows={10}
+                  placeholder="Write the system prompt for this mode..."
+                />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={handleModeSave} disabled={modeSaving || modeLoading}>
+                {modeSaving ? "Saving..." : modeLoading ? "Loading..." : "Save Mode Instructions"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <Card>
