@@ -126,6 +126,30 @@ export type Database = {
           },
         ]
       }
+      ai_training: {
+        Row: {
+          created_at: string
+          id: string
+          instructions: string
+          mode: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instructions?: string
+          mode: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instructions?: string
+          mode?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       always_never: {
         Row: {
           analyze_vs_distract_when_stressed: number | null
@@ -176,6 +200,38 @@ export type Database = {
           },
         ]
       }
+      boundaries: {
+        Row: {
+          boundary: string
+          created_at: string
+          id: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          boundary: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          boundary?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boundaries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           admin: boolean
@@ -184,6 +240,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          memory_store: Json | null
           onboarding_status: Database["public"]["Enums"]["onboarding_status"]
           updated_at: string
           user_id: string
@@ -195,6 +252,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          memory_store?: Json | null
           onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           updated_at?: string
           user_id: string
@@ -206,11 +264,79 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          memory_store?: Json | null
           onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      stuck_points: {
+        Row: {
+          created_at: string
+          id: string
+          point: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          point: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          point?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stuck_points_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_values: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_values_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
