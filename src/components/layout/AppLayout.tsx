@@ -93,19 +93,34 @@ const AppLayout: React.FC = () => {
               </NavLink>
             ))}
             {isAdmin && (
-              <NavLink
-                to="/training"
-                className={({ isActive }) =>
-                  cn(
-                    "px-3 py-2 rounded-md text-sm transition-colors",
-                    isActive
-                      ? "bg-secondary text-secondary-foreground"
-                      : "hover:bg-accent hover:text-accent-foreground"
-                  )
-                }
-              >
-                Training
-              </NavLink>
+              <>
+                <NavLink
+                  to="/training"
+                  className={({ isActive }) =>
+                    cn(
+                      "px-3 py-2 rounded-md text-sm transition-colors",
+                      isActive
+                        ? "bg-secondary text-secondary-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    )
+                  }
+                >
+                  Training
+                </NavLink>
+                <NavLink
+                  to="/admin/exam"
+                  className={({ isActive }) =>
+                    cn(
+                      "px-3 py-2 rounded-md text-sm transition-colors",
+                      isActive
+                        ? "bg-secondary text-secondary-foreground"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    )
+                  }
+                >
+                  Admin Exam
+                </NavLink>
+              </>
             )}
           </div>
 

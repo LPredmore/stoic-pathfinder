@@ -18,6 +18,7 @@ import OnboardingIndex from "./pages/OnboardingIndex";
 import OnboardingAlwaysNever from "./pages/OnboardingAlwaysNever";
 import OnboardingAgreeDisagree from "./pages/OnboardingAgreeDisagree";
 import Training from "./pages/Training";
+import AdminExam from "./pages/AdminExam";
 import AdminRoute from "./components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="settings" element={<Settings />} />
                 <Route element={<AdminRoute />}>
                   <Route path="training" element={<Training />} />
+                  <Route path="admin/exam" element={<AdminExam />} />
                 </Route>
               </Route>
             </Route>
