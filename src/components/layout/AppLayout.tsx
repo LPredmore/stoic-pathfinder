@@ -9,7 +9,7 @@ const navItems = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/role-play", label: "Role-Play" },
   { to: "/story", label: "Story" },
-  { to: "/goals", label: "Goals" },
+  { to: "/about-me", label: "About Me" },
   { to: "/settings", label: "Settings" },
 ];
 

@@ -9,7 +9,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import RolePlay from "./pages/RolePlay";
 import Story from "./pages/Story";
-import Goals from "./pages/Goals";
+import AboutMe from "./pages/AboutMe";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -42,7 +42,7 @@ const App = () => (
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="role-play" element={<RolePlay />} />
                 <Route path="story" element={<Story />} />
-                <Route path="goals" element={<Goals />} />
+                <Route path="about-me" element={<AboutMe />} />
                 <Route path="settings" element={<Settings />} />
                 <Route element={<AdminRoute />}>
                   <Route path="training" element={<Training />} />
