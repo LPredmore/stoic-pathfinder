@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -258,21 +259,29 @@ const AboutMe: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-3 md:grid-cols-3">
-                    <Input
-                      placeholder="Goal title"
-                      value={newGoalTitle}
-                      onChange={(e) => setNewGoalTitle(e.target.value)}
-                      aria-label="Goal title"
-                    />
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={newGoalProgress}
-                      onChange={(e) => setNewGoalProgress(parseInt(e.target.value || "0", 10))}
-                      aria-label="Goal progress (0-100)"
-                      placeholder="Progress %"
-                    />
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="new-goal-title">Goal</Label>
+                      <Input
+                        id="new-goal-title"
+                        placeholder="Goal"
+                        value={newGoalTitle}
+                        onChange={(e) => setNewGoalTitle(e.target.value)}
+                        aria-label="Goal"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="new-goal-progress">Progress %</Label>
+                      <Input
+                        id="new-goal-progress"
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={newGoalProgress}
+                        onChange={(e) => setNewGoalProgress(parseInt(e.target.value || "0", 10))}
+                        aria-label="Goal progress (0-100)"
+                        placeholder="Progress %"
+                      />
+                    </div>
                     <Button onClick={addGoal}>Add Goal</Button>
                   </div>
                   <div className="mt-3">
@@ -296,15 +305,22 @@ const AboutMe: React.FC = () => {
                     <CardContent className="pt-6">
                       {editingGoalId === g.id ? (
                         <div className="grid gap-3 md:grid-cols-3">
-                          <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} aria-label="Edit goal title" />
-                          <Input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={editProgress}
-                            onChange={(e) => setEditProgress(parseInt(e.target.value || "0", 10))}
-                            aria-label="Edit goal progress"
-                          />
+                          <div className="flex flex-col gap-1">
+                            <Label htmlFor={`edit-goal-title-${g.id}`}>Goal</Label>
+                            <Input id={`edit-goal-title-${g.id}`} value={editTitle} onChange={(e) => setEditTitle(e.target.value)} aria-label="Edit goal title" />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <Label htmlFor={`edit-goal-progress-${g.id}`}>Progress %</Label>
+                            <Input
+                              id={`edit-goal-progress-${g.id}`}
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={editProgress}
+                              onChange={(e) => setEditProgress(parseInt(e.target.value || "0", 10))}
+                              aria-label="Edit goal progress"
+                            />
+                          </div>
                           <div className="flex gap-2">
                             <Button size="sm" onClick={saveGoal}>Save</Button>
                             <Button size="sm" variant="outline" onClick={() => setEditingGoalId(null)}>Cancel</Button>
