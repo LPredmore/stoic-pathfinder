@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 
 // Quiz item model for preview-only rendering
  type QuizItem = {
@@ -68,6 +69,88 @@ const QUIZ: QuizItem[] = [
 
 const AdminExam: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [questionIdByText, setQuestionIdByText] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+        if (userId) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("user_id", userId)
+            .maybeSingle();
+          if (profile?.id) {
+            setProfileId(profile.id as string);
+          }
+        }
+
+        const prompts = QUIZ.map((q) => q.prompt);
+        const { data: qs } = await supabase
+          .from("questions")
+          .select("id,text")
+          .in("text", prompts);
+
+        const map: Record<string, string> = {};
+        (qs || []).forEach((q: any) => {
+          map[q.text] = q.id;
+        });
+        setQuestionIdByText(map);
+      } catch (e) {
+        console.error("AdminExam init failed:", e);
+      }
+    })();
+  }, []);
+
+  const getQuestionId = (prompt: string) => questionIdByText[prompt];
+
+  const saveTextResponse = async (item: QuizItem, response: string) => {
+    try {
+      if (!profileId) return;
+      const questionId = getQuestionId(item.prompt);
+      if (!questionId) return;
+      await (supabase as any)
+        .from("text_responses")
+        .upsert(
+          { profile_id: profileId, question_id: questionId, response },
+          { onConflict: "profile_id,question_id" }
+        );
+    } catch (e) {
+      console.error("saveTextResponse error:", e);
+    }
+  };
+
+  const upsertScaleResponse = async (item: QuizItem, value: string) => {
+    try {
+      if (!profileId) return;
+      const questionId = getQuestionId(item.prompt);
+      if (!questionId) return;
+      const num = parseInt(value, 10);
+      const { data: updated, error: updErr } = await supabase
+        .from("responses")
+        .update({ response_value: num, updated_at: new Date().toISOString() })
+        .eq("profile_id", profileId)
+        .eq("question_id", questionId)
+        .select("id");
+      if (updErr) {
+        console.error("responses update error:", updErr);
+      }
+      if (!updated || updated.length === 0) {
+        const { error: insErr } = await supabase.from("responses").insert({
+          profile_id: profileId,
+          question_id: questionId,
+          response_value: num,
+          source: "admin_exam",
+        } as any);
+        if (insErr) console.error("responses insert error:", insErr);
+      }
+    } catch (e) {
+      console.error("upsertScaleResponse error:", e);
+    }
+  };
 
   const renderControls = (item: QuizItem) => {
     const value = answers[item.id] ?? "";
@@ -78,7 +161,11 @@ const AdminExam: React.FC = () => {
         <ToggleGroup
           type="single"
           value={value}
-          onValueChange={(v) => v && setAnswers((prev) => ({ ...prev, [item.id]: v }))}
+          onValueChange={(v) => {
+            if (!v) return;
+            setAnswers((prev) => ({ ...prev, [item.id]: v }));
+            saveTextResponse(item, v);
+          }}
           className="grid grid-cols-1 gap-2 sm:grid-cols-2"
         >
           <ToggleGroupItem value={optA} aria-label={optA} className="justify-start">
@@ -96,7 +183,10 @@ const AdminExam: React.FC = () => {
         <div className="space-y-3">
           <RadioGroup
             value={value}
-            onValueChange={(v) => setAnswers((prev) => ({ ...prev, [item.id]: v }))}
+            onValueChange={(v) => {
+              setAnswers((prev) => ({ ...prev, [item.id]: v }));
+              upsertScaleResponse(item, v);
+            }}
             className="flex items-center gap-4"
           >
             {["1", "2", "3", "4", "5"].map((n) => (
@@ -118,6 +208,7 @@ const AdminExam: React.FC = () => {
       <Textarea
         value={value}
         onChange={(e) => setAnswers((prev) => ({ ...prev, [item.id]: e.target.value }))}
+        onBlur={(e) => saveTextResponse(item, e.target.value)}
         placeholder={item.placeholder || "Type your response..."}
         rows={5}
       />

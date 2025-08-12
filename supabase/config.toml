@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.openai-chat]
 verify_jwt = false
+
+[functions.qualitative-scorer]
+verify_jwt = false
