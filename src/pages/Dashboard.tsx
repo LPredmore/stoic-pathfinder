@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageSquare, Flame, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { listModes, getModeDisplayName } from "@/integrations/supabase/trainingService";
 
 const Dashboard: React.FC = () => {
   const { toast } = useToast();
@@ -16,7 +18,10 @@ const Dashboard: React.FC = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const [availableModes] = useState<string[]>(listModes());
+  const [selectedMode, setSelectedMode] = useState<string>(availableModes[0] ?? "express");
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -94,9 +99,26 @@ const Dashboard: React.FC = () => {
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="opacity-70" /> Live Coaching Chat
-            </CardTitle>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="opacity-70" /> Live Coaching Chat
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <span className="hidden text-sm text-muted-foreground md:inline">Mode</span>
+                <Select value={selectedMode} onValueChange={setSelectedMode}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableModes.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {getModeDisplayName(m)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="h-[320px] rounded-md border bg-muted/30">

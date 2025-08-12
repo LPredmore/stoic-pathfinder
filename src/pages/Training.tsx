@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { getModeInstructions, saveModeInstructions, listModes } from "@/integrations/supabase/trainingService";
+import { getModeInstructions, saveModeInstructions, listModes, getModeDisplayName } from "@/integrations/supabase/trainingService";
 
 const Training: React.FC = () => {
   const { toast } = useToast();
@@ -196,7 +196,7 @@ const Training: React.FC = () => {
                   <SelectContent>
                     {availableModes.map((m) => (
                       <SelectItem key={m} value={m}>
-                        {m.charAt(0).toUpperCase() + m.slice(1)}
+                        {getModeDisplayName(m)}
                       </SelectItem>
                     ))}
                   </SelectContent>

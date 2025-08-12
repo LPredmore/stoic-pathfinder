@@ -4,6 +4,16 @@ import type { Database } from "@/integrations/supabase/types";
 export const defaultModes = ["express", "reflect", "guide"] as const;
 export type CoachMode = (typeof defaultModes)[number] | string;
 
+export const modeDisplayMap: Record<string, string> = {
+  express: "Listen to Me",
+  reflect: "Understand Me",
+  guide: "Guide Me",
+};
+
+export function getModeDisplayName(mode: string): string {
+  return modeDisplayMap[mode] ?? mode;
+}
+
 type AiTrainingRow = Database["public"]["Tables"]["ai_training"]["Row"];
 
 export async function getModeInstructions(mode: string): Promise<AiTrainingRow | null> {
