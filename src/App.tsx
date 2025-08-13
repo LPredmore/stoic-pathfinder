@@ -7,8 +7,8 @@ import { HelmetProvider } from "react-helmet-async";
 import AppLayout from "./components/layout/AppLayout";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import RolePlay from "./pages/RolePlay";
-import Story from "./pages/Story";
+
+
 import AboutMe from "./pages/AboutMe";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -40,8 +40,8 @@ const App = () => (
                 <Route path="onboarding/always-never" element={<OnboardingAlwaysNever />} />
                 <Route path="onboarding/agree-disagree" element={<OnboardingAgreeDisagree />} />
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="role-play" element={<RolePlay />} />
-                <Route path="story" element={<Story />} />
+                
+                
                 <Route path="about-me" element={<AboutMe />} />
                 <Route path="settings" element={<Settings />} />
                 <Route element={<AdminRoute />}>

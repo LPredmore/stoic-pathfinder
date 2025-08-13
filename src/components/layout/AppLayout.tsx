@@ -7,8 +7,8 @@ import { useToast } from "@/components/ui/use-toast";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard" },
-  { to: "/role-play", label: "Role-Play" },
-  { to: "/story", label: "Story" },
+  
+  
   { to: "/about-me", label: "About Me" },
   { to: "/settings", label: "Settings" },
 ];

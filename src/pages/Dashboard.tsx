@@ -178,9 +178,6 @@ const bottomRef = useRef<HTMLDivElement | null>(null);
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
-              <Button variant="secondary" asChild>
-                <a href="/story">Today's Lesson</a>
-              </Button>
               <Button variant="outline" asChild>
                 <a href="/goals">Active Goal</a>
               </Button>
