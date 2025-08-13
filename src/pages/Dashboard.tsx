@@ -36,16 +36,10 @@ const bottomRef = useRef<HTMLDivElement | null>(null);
     setInput("");
     setLoading(true);
 
-    const { data, error } = await supabase.functions.invoke("openrouter", {
-      headers: { "x-debug": "1" },
+    const { data, error } = await supabase.functions.invoke("ai-coach", {
       body: {
         messages: next.map((m) => ({ role: m.role, content: m.content })),
-        model: "openai/gpt-4o-mini",
-        stream: false,
-        temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 600,
-        metadata: { title: "Stoic Coach" },
+        mode: selectedMode,
       },
     });
 
@@ -61,22 +55,25 @@ const bottomRef = useRef<HTMLDivElement | null>(null);
       return;
     }
 
-    // If server returned ok:false in debug mode
-    if (data && (data as any).error) {
-      console.error("OpenRouter error payload", data);
-      const status = (data as any).status;
-      const tried = (data as any).tried as string[] | undefined;
-      const msg = (data as any).openrouter?.error?.message || "Model unavailable";
-      toast({ title: `Model error (${status})`, description: `${msg}${tried?.length ? ` | Tried: ${tried.join(', ')}` : ''}`, variant: "destructive" as any });
-      // Add a friendly assistant message so the chat doesn't dead-end
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "I couldn’t reach the selected model via OpenRouter right now. You can try again shortly or switch models. Since you have balance, gpt-4o-mini should work once providers are available." },
-      ]);
-      return;
+    // Handle successful reply + optional memory save notice
+    const assistant = (data as any)?.reply ?? "(no response)";
+    const saved = (data as any)?.memoriesSaved;
+    if (saved && (saved.boundaries || saved.stuck_points || saved.goals || saved.relationships || saved.values || saved.notes)) {
+      const total =
+        (saved.boundaries ?? 0) +
+        (saved.stuck_points ?? 0) +
+        (saved.goals ?? 0) +
+        (saved.relationships ?? 0) +
+        (saved.values ?? 0) +
+        (saved.notes ?? 0);
+      if (total > 0) {
+        toast({
+          title: "Personalization updated",
+          description: `Captured ${total} new insight${total === 1 ? "" : "s"} to tailor your coaching.`,
+        });
+      }
     }
 
-    const assistant = data?.choices?.[0]?.message?.content ?? "(no response)";
     setMessages((prev) => [...prev, { role: "assistant", content: assistant }]);
   };
 
