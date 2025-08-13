@@ -469,6 +469,203 @@ export type Database = {
         }
         Relationships: []
       }
+      relationship_details: {
+        Row: {
+          birthday: string | null
+          communication_style: string | null
+          created_at: string
+          current_challenges: string | null
+          email: string | null
+          how_we_met: string | null
+          id: string
+          interests: string[] | null
+          location: string | null
+          personality_traits: string[] | null
+          phone: string | null
+          relationship_id: string
+          updated_at: string
+          values: string[] | null
+        }
+        Insert: {
+          birthday?: string | null
+          communication_style?: string | null
+          created_at?: string
+          current_challenges?: string | null
+          email?: string | null
+          how_we_met?: string | null
+          id?: string
+          interests?: string[] | null
+          location?: string | null
+          personality_traits?: string[] | null
+          phone?: string | null
+          relationship_id: string
+          updated_at?: string
+          values?: string[] | null
+        }
+        Update: {
+          birthday?: string | null
+          communication_style?: string | null
+          created_at?: string
+          current_challenges?: string | null
+          email?: string | null
+          how_we_met?: string | null
+          id?: string
+          interests?: string[] | null
+          location?: string | null
+          personality_traits?: string[] | null
+          phone?: string | null
+          relationship_id?: string
+          updated_at?: string
+          values?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_details_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationship_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_date: string
+          interaction_type: string | null
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          relationship_id: string
+          support_given: boolean
+          support_received: boolean
+          topic_tags: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_date?: string
+          interaction_type?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          relationship_id: string
+          support_given?: boolean
+          support_received?: boolean
+          topic_tags?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_date?: string
+          interaction_type?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          relationship_id?: string
+          support_given?: boolean
+          support_received?: boolean
+          topic_tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_interactions_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationship_memories: {
+        Row: {
+          created_at: string
+          description: string | null
+          emotional_impact: number | null
+          id: string
+          memory_date: string | null
+          memory_type: string | null
+          relationship_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          emotional_impact?: number | null
+          id?: string
+          memory_date?: string | null
+          memory_type?: string | null
+          relationship_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          emotional_impact?: number | null
+          id?: string
+          memory_date?: string | null
+          memory_type?: string | null
+          relationship_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationship_memories_relationship_id_fkey"
+            columns: ["relationship_id"]
+            isOneToOne: false
+            referencedRelation: "relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relationships: {
+        Row: {
+          contact_frequency: string | null
+          created_at: string
+          emotional_significance: number | null
+          id: string
+          name: string
+          profile_id: string
+          relationship_status: string
+          relationship_subtype: string | null
+          relationship_type: string
+          updated_at: string
+        }
+        Insert: {
+          contact_frequency?: string | null
+          created_at?: string
+          emotional_significance?: number | null
+          id?: string
+          name: string
+          profile_id: string
+          relationship_status?: string
+          relationship_subtype?: string | null
+          relationship_type: string
+          updated_at?: string
+        }
+        Update: {
+          contact_frequency?: string | null
+          created_at?: string
+          emotional_significance?: number | null
+          id?: string
+          name?: string
+          profile_id?: string
+          relationship_status?: string
+          relationship_subtype?: string | null
+          relationship_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relationships_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       responses: {
         Row: {
           created_at: string
